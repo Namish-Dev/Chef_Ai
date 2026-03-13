@@ -1,0 +1,30 @@
+name: Daily Indian Meal Planner
+
+on:
+  schedule:
+    # 1:30 AM UTC = 7:00 AM IST every day
+    - cron: '30 1 * * *'
+  workflow_dispatch:  # allows manual trigger from GitHub UI
+
+jobs:
+  send-meal-plan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run meal planner
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python meal_planner.py
